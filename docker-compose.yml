@@ -2,17 +2,6 @@ version: "3"
 
 services:
 
-  fluentd:
-    container_name: test_fluentd
-    restart: always
-    image: fluent/fluentd:v1.1.1-onbuild
-    volumes:
-      - $PWD:/fluentd/etc
-    ports:
-      - "24224:24224"
-    networks:
-      - test_net
-
   app:
     restart: always
     build: .
@@ -30,6 +19,40 @@ services:
         fluentd-address: "localhost:24224"
         fluentd-async-connect: "true"
         tag: docker
+
+  fluentd:
+    container_name: test_fluentd
+    restart: always
+    build: ./fluentd
+    volumes:
+      - $PWD/fluentd/conf:/fluentd/etc
+    links:
+      - "elasticsearch"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - test_net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      - "discovery.type=single-node"
+    expose:
+      - "9200"
+    ports:
+      - "9200:9200"
+    networks:
+      - test_net
+
+  kibana:
+    image: kibana:7.10.1
+    links:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
+    networks:
+      - test_net
 
 networks:
   test_net:

@@ -7,6 +7,10 @@ Docker logging with docker fluentd logger settings, fluentd writes messages to t
 *Goal: you don't need to add fluent dependency to your code,* just logging to standard output.
 You can route your log messages with _dest: journal_ key, and it will be saved to journal database, any others will be saved to the log database.
 
+# For Elasticsearch and Kibana
+*Add folder fluentd, define Dockerfile and add plugin. add configurations in fluent.conf file.
+*include elasticsearch and kibana services to docker-compose.
+
 * mvn clean install
 
 * Start with ```docker-compose up -d --build```
@@ -14,6 +18,10 @@ You can route your log messages with _dest: journal_ key, and it will be saved t
 * Log some message with ```curl -X GET http://localhost:4000/greeting```
 
 * Tail fluentd log with ```docker logs --follow test_fluentd```
+
+* browse "http://localhost:5601/app/management/kibana/indexPatterns" and setup index name pattern for kibana.
+  Specify fluentd-* to "Index name or pattern" and click "Create".
+  From menu select discover and add available fields to see the log values in columns.
 
 * Stop with ```CTRL-C``` and ```docker-compose down --remove-orphans```
 
